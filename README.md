@@ -78,3 +78,41 @@ Environ 43 500 relevés par jour (453 stations × 96 relevés), soit près de 4 
 
 **Limite importante** : l'API indique le nombre de vélos présents à un instant donné, et non le nombre de locations. L'activité des stations sera donc estimée à partir des variations de disponibilité entre deux relevés, ce qui sous-estime les trajets courts et peut être perturbé par les opérations de rééquilibrage des vélos.
 
+## Lancer le projet
+
+**Prérequis**
+- Docker et Docker Compose
+- Une clé d'API JCDecaux, gratuite sur [developer.jcdecaux.com](https://developer.jcdecaux.com)
+
+**1. Récupérer le projet et configurer les secrets**
+
+```bash
+git clone https://github.com/nezerwe/velotoulouse-pipeline.git
+cd velotoulouse-pipeline
+cp .env.example .env
+```
+
+Modifiez ensuite le fichier `.env` pour y définir un mot de passe solide.
+
+**2. Démarrer n8n et PostgreSQL**
+
+```bash
+docker compose up -d
+```
+
+Les tables sont créées automatiquement au premier démarrage, à partir de `init.sql`.
+
+**3. Configurer n8n**
+- Ouvrez `http://localhost:5678` (sur un serveur distant, via un tunnel SSH : `ssh -L 5678:localhost:5678 utilisateur@serveur`).
+- Créez deux credentials :
+  - **Postgres** : hôte `postgres`, base, utilisateur et mot de passe définis dans `.env`, port `5432` ;
+  - **Query Auth** : nom `apiKey`, valeur = votre clé JCDecaux.
+- Importez `workflow/Collecte VélôToulouse.json`, associez les credentials aux nœuds HTTP Request et Postgres, puis publiez le workflow.
+
+**4. Vérifier la collecte**
+
+```bash
+docker compose exec postgres psql -U velo -d velotoulouse -c "SELECT COUNT(*) FROM releves;"
+```
+
+Le nombre de lignes augmente de 453 toutes les 15 minutes.
