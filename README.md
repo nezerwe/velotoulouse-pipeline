@@ -116,3 +116,30 @@ docker compose exec postgres psql -U velo -d velotoulouse -c "SELECT COUNT(*) FR
 ```
 
 Le nombre de lignes augmente de 453 toutes les 15 minutes.
+
+## Structure du dépôt
+
+```
+velotoulouse-pipeline/
+├── workflow/
+│   └── Collecte VélôToulouse.json   # Workflow n8n de collecte
+├── docker-compose.yml               # Services n8n et PostgreSQL
+├── init.sql                         # Création des tables et du calendrier
+├── .env.example                     # Modèle des variables secrètes
+└── .gitignore
+```
+
+## Avancement
+
+- [x] Collecte automatisée de l'API JCDecaux avec n8n
+- [x] Base PostgreSQL et déploiement sur un serveur cloud avec Docker
+- [ ] Contrôle de la qualité des données (trous de collecte, stations fermées, valeurs aberrantes)
+- [ ] Analyse des rythmes horaires et hebdomadaires
+- [ ] Analyse des effets du calendrier et des événements
+- [ ] Classification des stations par profils d'usage
+- [ ] Tableau de bord interactif
+
+## Auteur
+
+**Ghislain Nezerwe** – Étudiant en Master Science et Ingénierie des Données, Université de Toulouse
+[LinkedIn](https://www.linkedin.com/in/ghislain-nezerwe-3b72b3299)
