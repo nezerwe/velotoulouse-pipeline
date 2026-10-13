@@ -1,0 +1,7 @@
+# Secrets
+.env
+
+# Sauvegardes de la base
+*.dump
+*.sql.gz
+backups/
