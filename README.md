@@ -22,7 +22,7 @@ Comprendre les dynamiques d'utilisation des vélos en libre-service à Toulouse,
 
 **Effets des événements**
 - Les manifestations modifient-elles l'usage des stations situées à proximité ?
-- Les fermetures de stations de métro pour travaux reportent-elles des usagers vers le vélo ?
+- Les perturbations du réseau Tisséo (fermetures de stations de métro ou de tram, déviations de bus) autour d'une station VélôToulouse modifient-elles la disponibilité des vélos ? Le rayon d'influence autour de chaque station sera déterminé lors de l'analyse.
 
 **Comparaisons entre stations et types de vélos**
 - Quelles sont les stations les plus et les moins sollicitées ?
@@ -34,7 +34,8 @@ Comprendre les dynamiques d'utilisation des vélos en libre-service à Toulouse,
 ```mermaid
 flowchart LR
     A["API temps réel JCDecaux<br/>453 stations"] -->|toutes les 15 min| B["n8n<br/>collecte et transformation"]
-    B --> C[("PostgreSQL<br/>relevés et stations")]
+    T["API Tisséo<br/>messages d'information réseau<br/>(prévu)"] -.-> B
+    B --> C[("PostgreSQL<br/>relevés, stations, événements")]
     D["Calendrier et événements<br/>saisis manuellement"] --> C
     C --> E["Analyse<br/>SQL et Python"]
     subgraph S["Serveur cloud Hetzner (Docker Compose)"]
@@ -62,7 +63,7 @@ Environ 43 500 relevés par jour (453 stations × 96 relevés), soit près de 4 
 | `releves` | Disponibilité de chaque station à chaque relevé | Automatique, toutes les 15 minutes |
 | `stations` | Nom, adresse et coordonnées GPS des stations | Automatique (mise à jour si une station apparaît) |
 | `calendrier` | Jour de la semaine, week-end, jours fériés, vacances scolaires et universitaires | Pré-remplie |
-| `evenements` | Manifestations, fermetures de stations de métro, autres événements, avec leur lieu | Saisie manuelle au fil de la période |
+| `evenements` | Manifestations et perturbations du réseau Tisséo (métro, tram, bus), avec leur lieu | Saisie manuelle, puis collecte automatique des messages Tisséo (prévu) |
 
 **Principales variables de la table `releves`**
 
@@ -133,6 +134,7 @@ velotoulouse-pipeline/
 
 - [x] Collecte automatisée de l'API JCDecaux avec n8n
 - [x] Base PostgreSQL et déploiement sur un serveur cloud avec Docker
+- [ ] Intégration des perturbations du réseau Tisséo (métro, tram, bus) comme variable événement
 - [ ] Contrôle de la qualité des données (trous de collecte, stations fermées, valeurs aberrantes)
 - [ ] Analyse des rythmes horaires et hebdomadaires
 - [ ] Analyse des effets du calendrier et des événements
